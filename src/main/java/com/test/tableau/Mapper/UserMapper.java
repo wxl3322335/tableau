@@ -37,7 +37,7 @@ public interface UserMapper {
 
 
     /**
-     * 2.query by username
+     * 2.query by sex
      */
     public List<User> getUserByName(Long sex);
 
