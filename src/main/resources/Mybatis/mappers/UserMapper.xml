@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.tableau.Mapper.UserMapper">
+
+
+<!--<resultMap type="User" id="User">-->
+<!--<id column="id" property="id"/>-->
+<!--<result column="username" property="username"/>-->
+<!--<result column="nickname" property="nickname"/>-->
+<!--<result column="numbs" property="numbs"/>-->
+<!--</resultMap>-->
+
+
+<!--  com.test.tableau.Bean.User-->
+<!--    mybatis里面的id其实就是对应mapper接口里面的对应的方法-->
+<select id="getAllUsers" resultType="com.test.tableau.Bean.User">
+    with t1 as
+            (
+                select
+                    username,
+                    password,
+                    nickname,
+                    count(*) as numbs
+                from student
+                where username regexp "芷若|敏"
+                group by 1,2,3
+            )
+    select
+        username,
+        password,
+        nickname,
+        sum(numbs) as numbs,
+        sum(numbs) as numbs2
+        from t1
+    group by 1,2,3
+    having username regexp "芷若"
+</select>
+
+
+
+    <select id="getUserByName" parameterType="java.lang.Long" resultType="com.test.tableau.Bean.User">
+        select * from student where sex = #{sex}
+    </select>
+
+
+
+
+</mapper>

@@ -1,0 +1,13 @@
+package com.test.tableau;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class TableauApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}
