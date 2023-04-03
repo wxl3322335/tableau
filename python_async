@@ -184,3 +184,45 @@ def read_data_from_oracle(instances, sqls, num_threads):
             df = future.result()
             results[(df.iloc[0]['INSTANCE_NAME'], df.iloc[0]['SQL_ID'])] = df
     return pd.concat(results.values(), ignore_index=True)
+    
+    
+    
+    
+    
+    
+    
+ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+
+# 定义需要并行执行的函数列表
+def func1(arg1, arg2):
+    # 函数1的实现
+    pass
+
+def func2(arg1, arg2):
+    # 函数2的实现
+    pass
+
+def func3(arg1, arg2):
+    # 函数3的实现
+    pass
+
+func_list = [func1, func2, func3]
+
+# 定义参数列表
+arg1_list = [1, 2, 3]
+arg2_list = ['a', 'b', 'c']
+arg_list = [(arg1, arg2) for arg1 in arg1_list for arg2 in arg2_list]
+
+# 创建线程池或进程池并提交任务
+with ThreadPoolExecutor() as executor:
+    futures = [executor.submit(func, *args) for func in func_list for args in arg_list]
+    # 或者使用ProcessPoolExecutor
+    # with ProcessPoolExecutor() as executor:
+    #     futures = [executor.submit(func, *args) for func in func_list for args in arg_list]
+
+# 获取任务结果
+result_list = []
+for future in as_completed(futures):
+    result = future.result()
+    result_list.append(result)
+
