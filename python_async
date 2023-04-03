@@ -82,3 +82,37 @@ if __name__ == '__main__':
     df = pd.concat(results)
     # 对结果进行后续处理
     # ...
+
+
+
+
+
+
+import asyncio
+import pandas as pd
+import cx_Oracle
+
+async def read_table(conn_info, table_name):
+    # 连接Oracle数据库
+    conn = await asyncio.get_event_loop().run_in_executor(None, cx_Oracle.connect, conn_info)
+    # 读取表数据
+    df = await asyncio.get_event_loop().run_in_executor(None, pd.read_sql, f"SELECT * FROM {table_name}", conn)
+    # 关闭数据库连接
+    await asyncio.get_event_loop().run_in_executor(None, conn.close)
+    return df
+
+async def main():
+    # 定义需要读取的表名和对应的Oracle实例连接信息
+    table_infos = {
+        'table1': 'user1/password1@host1:port1/service_name1',
+        'table2': 'user2/password2@host2:port2/service_name2',
+        'table3': 'user3/password3@host3:port3/service_name3'
+    }
+    # 并发读取表数据
+    tasks = [asyncio.create_task(read_table(conn_info, table_name)) for table_name, conn_info in table_infos.items()]
+    results = await asyncio.gather(*tasks)
+    # 处理读取的结果
+    # ...
+
+if __name__ == '__main__':
+    asyncio.run(main())
