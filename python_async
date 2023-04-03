@@ -1,0 +1,22 @@
+import asyncio
+import aiomysql
+
+async def read_sql(host, user, password, database, sql, result_list):
+    conn = await aiomysql.connect(host=host, user=user, password=password, db=database, charset='utf8mb4')
+    cursor = await conn.cursor()
+    await cursor.execute(sql)
+    result = await cursor.fetchall()
+    result_list.append(result)
+    await cursor.close()
+    conn.close()
+
+if __name__ == '__main__':
+    sql_list = [('localhost', 'root', '123456', 'test1', 'select * from table1'),
+                ('localhost', 'root', '123456', 'test2', 'select * from table2'),
+                ('localhost', 'root', '123456', 'test3', 'select * from table3')]
+    result_list = []
+    loop = asyncio.get_event_loop()
+    tasks = [read_sql(*item[:-1], item[-1], result_list) for item in sql_list]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop.close()
+    print(result_list)
