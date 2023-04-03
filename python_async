@@ -20,3 +20,65 @@ if __name__ == '__main__':
     loop.run_until_complete(asyncio.wait(tasks))
     loop.close()
     print(result_list)
+
+
+
+
+
+import asyncio
+import pandas as pd
+import cx_Oracle
+
+async def read_sql(sql):
+    # 连接Oracle数据库
+    conn = await asyncio.get_event_loop().run_in_executor(None, cx_Oracle.connect, 'user/password@host:port/service_name')
+    # 执行SQL语句并获取结果集
+    result = await asyncio.get_event_loop().run_in_executor(None, pd.read_sql, sql, conn)
+    # 关闭数据库连接
+    await asyncio.get_event_loop().run_in_executor(None, conn.close)
+    return result
+
+async def main():
+    # 定义需要读取的SQL语句
+    sql_list = ['SELECT * FROM table1', 'SELECT * FROM table2']
+    # 并发读取SQL语句的结果
+    tasks = [asyncio.create_task(read_sql(sql)) for sql in sql_list]
+    results = await asyncio.gather(*tasks)
+    # 合并结果集
+    df = pd.concat(results)
+    # 对结果进行后续处理
+    # ...
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+
+
+
+
+
+
+import pandas as pd
+import multiprocessing as mp
+import cx_Oracle
+
+def read_sql(sql):
+    # 连接Oracle数据库
+    conn = cx_Oracle.connect('user/password@host:port/service_name')
+    # 执行SQL语句并获取结果集
+    result = pd.read_sql(sql, conn)
+    # 关闭数据库连接
+    conn.close()
+    return result
+
+if __name__ == '__main__':
+    # 定义需要读取的SQL语句
+    sql_list = ['SELECT * FROM table1', 'SELECT * FROM table2']
+    # 创建进程池
+    pool = mp.Pool(processes=len(sql_list))
+    # 并发读取SQL语句的结果
+    results = pool.map(read_sql, sql_list)
+    # 合并结果集
+    df = pd.concat(results)
+    # 对结果进行后续处理
+    # ...
