@@ -1,3 +1,52 @@
+from tableauhyperapi import HyperProcess, Telemetry, Connection, CreateMode, TableName
+
+# 新Hyper文件的路径和名称
+new_hyper_path = "new_hyper_file.hyper"
+
+# Hyper文件1的路径和表名
+source_database_path_1 = "source_database_1.hyper"
+source_table_1 = TableName("public", "source_table_1")
+
+# Hyper文件2的路径和表名
+source_database_path_2 = "source_database_2.hyper"
+source_table_2 = TableName("public", "source_table_2")
+
+# 创建新Hyper文件
+with HyperProcess(telemetry=Telemetry.DO_NOT_SEND_USAGE_DATA_TO_TABLEAU) as hyper:
+
+    with Connection(endpoint=hyper.endpoint,
+                    database=new_hyper_path,
+                    create_mode=CreateMode.CREATE_AND_REPLACE) as connection:
+
+        # 复制第一个表
+        connection.catalog.add_table_from_existing(
+            table_name=TableName("public", "new_table"),
+            source_database=source_database_path_1,
+            source_table=source_table_1,
+            new_table_definition="CREATE TABLE new_table AS SELECT * FROM source_table_1"
+        )
+
+        # 复制第二个表
+        connection.catalog.add_table_from_existing(
+            table_name=TableName("public", "new_table"),
+            source_database=source_database_path_2,
+            source_table=source_table_2,
+            new_table_definition="CREATE TABLE new_table AS SELECT * FROM source_table_2"
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import requests
 import json
 
