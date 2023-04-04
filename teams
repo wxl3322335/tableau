@@ -1,0 +1,61 @@
+import requests
+import json
+
+# Microsoft Graph API endpoint
+GRAPH_API_ENDPOINT = 'https://graph.microsoft.com/v1.0'
+
+# Access token for Microsoft Graph API
+ACCESS_TOKEN = '<your access token>'
+
+# ID of the Teams channel to send the message to
+channel_id = '<channel ID>'
+
+# Path to the image file to send
+IMAGE_PATH = 'image.jpg'
+
+# Open the image file as binary data
+with open(IMAGE_PATH, 'rb') as f:
+    image_data = f.read()
+
+# Microsoft Graph API request to upload the image as a file
+url = f'{GRAPH_API_ENDPOINT}/teams/{channel_id}/drive/root:/{IMAGE_PATH.split("/")[-1]}:/content'
+headers = {
+    'Authorization': f'Bearer {ACCESS_TOKEN}',
+    'Content-Type': 'image/jpeg'
+}
+response = requests.put(url, headers=headers, data=image_data)
+
+# Check response status code
+if response.status_code == 201:
+    print('Image uploaded successfully')
+else:
+    print(f'Error uploading image: {response.status_code} {response.reason}')
+
+# Get the ID of the uploaded file
+file_id = response.json().get('id')
+
+# Microsoft Graph API request to send a message with the image attachment
+url = f'{GRAPH_API_ENDPOINT}/teams/{channel_id}/messages'
+data = {
+    'subject': 'New image',
+    'body': {
+        'contentType': 'html',
+        'content': 'Here is a new image:'
+    },
+    'attachments': [{
+        'id': file_id,
+        '@odata.type': '#microsoft.graph.fileAttachment',
+        'name': IMAGE_PATH.split("/")[-1]
+    }]
+}
+headers = {
+    'Authorization': f'Bearer {ACCESS_TOKEN}',
+    'Content-Type': 'application/json'
+}
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+# Check response status code
+if response.status_code == 201:
+    print('Message sent with image attachment')
+else:
+    print(f'Error sending message with image attachment: {response.status_code} {response.reason}')
